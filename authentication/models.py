@@ -1,14 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import APIException
+from rest_framework import status
 
 class UserManager(BaseUserManager):
 
     def create_user(self, username: str, email: str, password : str | None= None):
         if username is None:
-            raise TypeError('User should have username')
+            raise APIException('User should have username')
         if email is None:
-            raise TypeError('User should have email')
+            raise APIException('User should have email')
+        
+        if User.objects.filter(username = username).first():
+            raise APIException('Username is already taken')
+
+        if User.objects.filter(email = email).first():
+            raise APIException('Email is already taken')
         
         user = self.model(username = username, email=self.normalize_email(email))
         user.set_password(password)
@@ -45,7 +53,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     def tokens(self):
-        return ''
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
     
         
 
