@@ -7,7 +7,8 @@ from .models import User
 class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(max_length = 255, min_length=6, write_only=True)
     email = serializers.EmailField(max_length = 255, min_length=6)
-    username = serializers.CharField(max_length = 255, min_length=6 )
+    username = serializers.CharField(max_length=255, min_length=3, read_only=True)
+ 
 
     class Meta:
         model = User
@@ -38,7 +39,15 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(max_length=255, min_length=6)
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     username = serializers.CharField(max_length=68, min_length=6, read_only= True)
-    tokens = serializers.CharField(max_length=255, min_length=6, read_only= True)
+    tokens = serializers.SerializerMethodField()
+
+    def get_tokens(self, obj):
+        print('asdklasknskn')
+        user = User.objects.get(email=obj['email'])
+        return {
+            'refresh': user.tokens()['refresh'],
+            'access': user.tokens()['access']
+        }
 
     class Meta:
         model = User
@@ -47,7 +56,6 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, attrs):
         email = attrs.get('email','')
         password = attrs.get('password','')
-        print(attrs)
 
         user = auth.authenticate(email = email, password= password)
 
@@ -66,3 +74,5 @@ class LoginSerializer(serializers.Serializer):
             'username': user.get_username,
             'tokens': user.tokens()
         }
+
+        
