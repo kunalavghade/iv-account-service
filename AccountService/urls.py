@@ -25,12 +25,12 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Accounts API",
       default_version='v1',
-      description="Test description",
+      description="Accounts Service",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
+      contact=openapi.Contact(email="kunal77avghade.com"),
+      license=openapi.License(name="MIT"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
